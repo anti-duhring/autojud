@@ -13,3 +13,5 @@ up:
 generate:
 	@echo "Generating..."
 	@go generate ./...
+test:
+	@go run github.com/onsi/ginkgo/v2/ginkgo -v -p --race ./tests --output-interceptor-mode=none

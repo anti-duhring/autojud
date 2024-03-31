@@ -17,3 +17,9 @@ type User struct {
 	UpdatedAt string  `json:"updatedAt"`
 	DeletedAt *string `json:"deletedAt,omitempty"`
 }
+
+type UserInput struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}

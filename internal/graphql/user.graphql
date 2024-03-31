@@ -8,8 +8,14 @@ type User {
   deletedAt: String
 }
 
+input UserInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
 type Mutation {
-  createUser(name: String!, email: String!, password: String!): User!
-  updateUser(id: ID!, name: String, email: String, password: String): User!
-  deleteUser(id: ID!): User!
+  CreateUser(input: UserInput!): User!
+  UpdateUser(id: ID!, input: UserInput!): User!
+  DeleteUser(id: ID!): User!
 }

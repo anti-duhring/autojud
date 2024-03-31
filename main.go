@@ -29,7 +29,9 @@ func main() {
 		port = "8080"
 	}
 
-	srv := handler.NewDefaultServer(genGraphql.NewExecutableSchema(genGraphql.Config{Resolvers: &resolvers.Resolver{}}))
+	srv := handler.NewDefaultServer(genGraphql.NewExecutableSchema(genGraphql.Config{Resolvers: &resolvers.Resolver{
+		UserService: userService,
+	}}))
 
 	logger.Debug(fmt.Sprintf("connect to http://localhost:%s/query for GraphQL", port))
 	http.Handle("/query", srv)
