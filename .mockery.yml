@@ -1,0 +1,7 @@
+with-expecter: true
+packages:
+  github.com/anti-duhring/autojud/internal/user:
+    config:
+      dir: ../../tests/mocks/
+      all: true
+      outpkg: mocks
