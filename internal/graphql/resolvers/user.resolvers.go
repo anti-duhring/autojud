@@ -13,11 +13,11 @@ import (
 )
 
 // CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input graphql1.UserInput) (*graphql1.User, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, input graphql1.CreateUserInput) (*graphql1.User, error) {
 	user := user.User{
 		Name:     input.Name,
 		Email:    input.Email,
-		Password: input.Password,
+		Password: &input.Password,
 	}
 	createdUser, err := r.UserService.Create(user, ctx)
 	if err != nil {
@@ -32,7 +32,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input graphql1.UserIn
 }
 
 // UpdateUser is the resolver for the updateUser field.
-func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input graphql1.UserInput) (*graphql1.User, error) {
+func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input graphql1.CreateUserInput) (*graphql1.User, error) {
 	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))
 }
 

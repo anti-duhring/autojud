@@ -2,20 +2,20 @@ type User {
   id: ID!
   name: String!
   email: String!
-  password: String!
+  password: String
   createdAt: String!
   updatedAt: String!
   deletedAt: String
 }
 
-input UserInput {
+input CreateUserInput {
   name: String!
   email: String!
   password: String!
 }
 
 type Mutation {
-  CreateUser(input: UserInput!): User!
-  UpdateUser(id: ID!, input: UserInput!): User!
+  CreateUser(input: CreateUserInput!): User!
+  UpdateUser(id: ID!, input: CreateUserInput!): User!
   DeleteUser(id: ID!): User!
 }

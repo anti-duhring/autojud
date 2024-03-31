@@ -15,6 +15,7 @@ import (
 )
 
 var c *client.Client
+var userRepo user.Repository
 
 func Test(t *testing.T) {
 	os.Setenv("TZ", "UTC")
@@ -25,7 +26,7 @@ func Test(t *testing.T) {
 
 var _ = BeforeSuite(func() {
 	t := GinkgoT()
-	userRepo := mocks.NewMockRepository(t)
+	userRepo = mocks.NewMockRepository(t)
 	userService := user.NewService(userRepo)
 
 	server := handler.NewDefaultServer(genGraphql.NewExecutableSchema(genGraphql.Config{Resolvers: &resolvers.Resolver{
