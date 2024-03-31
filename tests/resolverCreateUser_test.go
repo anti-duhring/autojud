@@ -64,4 +64,47 @@ var _ = Describe("resolverCustomerRequestAccess", func() {
 		Expect(resp.CreateUser.UpdatedAt).ToNot(BeNil())
 		Expect(resp.CreateUser.DeletedAt).To(BeNil())
 	})
+
+	It("returns an error if email is invalid", func() {
+		input := genGraphql.CreateUserInput{
+			Name:     "Matt",
+			Email:    "mattmail.com",
+			Password: "password",
+		}
+
+		_, err := makeRequest(
+			client.Var("input", input),
+		)
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError(ContainSubstring(user.ErrEmailInvalid.Error())))
+	})
+
+	It("returns an error if password is empty", func() {
+		input := genGraphql.CreateUserInput{
+			Name:     "Matt",
+			Email:    "matt@mail.com",
+			Password: "",
+		}
+
+		_, err := makeRequest(
+			client.Var("input", input),
+		)
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError(ContainSubstring(user.ErrPasswordEmpty.Error())))
+	})
+
+	It("returns an error if name is empty", func() {
+		input := genGraphql.CreateUserInput{
+			Name:     "",
+			Email:    "matt@mail.com",
+			Password: "password",
+		}
+
+		_, err := makeRequest(
+			client.Var("input", input),
+		)
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError(ContainSubstring(user.ErrNameEmpty.Error())))
+	})
+
 })

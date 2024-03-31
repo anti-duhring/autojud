@@ -23,7 +23,7 @@ func (u *User) Validate() error {
 	if u.Email == "" {
 		return ErrEmailEmpty
 	}
-	if u.Password == nil {
+	if u.Password == nil || *u.Password == "" {
 		return ErrPasswordEmpty
 	}
 
