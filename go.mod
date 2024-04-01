@@ -5,6 +5,8 @@ go 1.22.1
 require (
 	github.com/99designs/gqlgen v0.17.45
 	github.com/anti-duhring/goncurrency v0.0.0-20240306020008-09c20c96f4da
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/go-chi/chi v1.5.5
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.5.5
 	github.com/onsi/ginkgo/v2 v2.17.1
@@ -12,6 +14,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/vektah/gqlparser/v2 v2.5.11
 	github.com/vektra/mockery/v2 v2.42.1
+	golang.org/x/crypto v0.21.0
 )
 
 require (
@@ -54,7 +57,6 @@ require (
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/urfave/cli/v2 v2.27.1 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
-	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/mod v0.16.0 // indirect
 	golang.org/x/net v0.22.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect

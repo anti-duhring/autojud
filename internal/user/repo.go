@@ -7,6 +7,7 @@ import (
 
 type Repository interface {
 	Create(ctx context.Context, user User) (*User, error)
+	GetByID(ctx context.Context, id string) (*User, error)
 }
 
 type RepositoryPostgres struct {
@@ -27,4 +28,16 @@ func (r *RepositoryPostgres) Create(ctx context.Context, user User) (*User, erro
 	}
 
 	return &createdUser, nil
+}
+
+func (r *RepositoryPostgres) GetByID(ctx context.Context, id string) (*User, error) {
+	var user User
+
+	query := `SELECT * FROM users WHERE id = $1;`
+	err := r.DB.QueryRowContext(ctx, query, id).Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }

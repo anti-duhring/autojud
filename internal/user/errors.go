@@ -7,4 +7,5 @@ var (
 	ErrEmailEmpty    = errors.New("Email can't be empty")
 	ErrPasswordEmpty = errors.New("Password can't be empty")
 	ErrEmailInvalid  = errors.New("Email is invalid")
+	ErrInternal      = errors.New("Internal error")
 )
