@@ -4,8 +4,12 @@ package resolvers
 //
 // It serves as dependency injection for your app, add any dependencies you require here.
 
-import "github.com/anti-duhring/autojud/internal/user"
+import (
+	"github.com/anti-duhring/autojud/internal/auth"
+	"github.com/anti-duhring/autojud/internal/user"
+)
 
 type Resolver struct {
 	UserService *user.Service
+	AuthService *auth.Service
 }

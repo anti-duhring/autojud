@@ -1,9 +1,9 @@
 package jwt
 
 import (
-	"log"
 	"time"
 
+	"github.com/anti-duhring/goncurrency/pkg/logger"
 	"github.com/dgrijalva/jwt-go"
 )
 
@@ -11,31 +11,45 @@ var (
 	SecretKey = []byte("secret")
 )
 
-func GenerateToken(userID string) (string, error) {
-	token := jwt.New(jwt.SigningMethodHS256)
+type JwtClaims struct {
+	UserID string  `json:"userId"`
+	Exp    float64 `json:"exp"`
+}
 
-	claims := token.Claims.(jwt.MapClaims)
-	claims["userID"] = userID
-	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+func GenerateToken(userID string) (string, int64, error) {
+
+	exp := time.Now().Add(time.Hour * 24 * 7).Unix()
+
+	claims := jwt.MapClaims{
+		"userID": userID,
+		"exp":    exp,
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	tokenString, err := token.SignedString(SecretKey)
 	if err != nil {
-		log.Fatal("Error in Generating key")
-		return "", err
+		logger.Error("Error generating token", err)
+		return "", 0, err
 	}
 
-	return tokenString, nil
+	return tokenString, exp, nil
 }
 
-func ParseToken(tokenStr string) (string, error) {
+func TokenExpired(exp int64) bool {
+	return time.Now().Unix() > exp
+}
+
+func ParseToken(tokenStr string) (*JwtClaims, error) {
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 		return SecretKey, nil
 	})
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userID := claims["userID"].(string)
-		return userID, nil
-	} else {
-		return "", err
+		return &JwtClaims{
+			UserID: claims["userID"].(string),
+			Exp:    claims["exp"].(float64),
+		}, nil
 	}
+
+	return nil, err
 }

@@ -22,12 +22,14 @@ func main() {
 
 	userRepo := user.NewRepositoryPostgres(db)
 	userService := user.NewService(userRepo)
+	authService := auth.NewService(*userService)
 
 	router := chi.NewRouter()
 	router.Use(auth.Middleware(*userService))
 
 	srv := handler.NewDefaultServer(genGraphql.NewExecutableSchema(genGraphql.Config{Resolvers: &resolvers.Resolver{
 		UserService: userService,
+		AuthService: authService,
 	}}))
 
 	port := os.Getenv("API_PORT")

@@ -2,6 +2,12 @@
 
 package graphql
 
+type AuthResponse struct {
+	User     *User   `json:"user"`
+	Token    string  `json:"token"`
+	TokenExp float64 `json:"tokenExp"`
+}
+
 type CreateUserInput struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`

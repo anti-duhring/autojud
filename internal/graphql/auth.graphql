@@ -1,0 +1,13 @@
+scalar Any
+
+type AuthResponse {
+  user: User!
+  token: String!
+  tokenExp: Float!
+}
+
+extend type Mutation {
+  Login(email: String!, password: String!): AuthResponse! @goField(forceResolver: true)
+  Register(input: CreateUserInput!): AuthResponse! @goField(forceResolver: true)
+}
+

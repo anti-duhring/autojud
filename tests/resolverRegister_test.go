@@ -13,18 +13,22 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-var _ = Describe("resolverCustomerRequestAccess", func() {
-	type createUserResp struct {
-		CreateUser genGraphql.User
+var _ = Describe("resolverRegister", func() {
+	type registerResp struct {
+		Register genGraphql.AuthResponse
 	}
 
-	makeRequest := func(options ...client.Option) (createUserResp, error) {
-		var resp createUserResp
-		err := c.Post(`mutation CreateUser($input: CreateUserInput!) {
-			CreateUser(input: $input) {
-				id
-        name
-        email
+	makeRequest := func(options ...client.Option) (registerResp, error) {
+		var resp registerResp
+		err := c.Post(`mutation Register($input: CreateUserInput!) {
+			Register(input: $input) {
+				user {
+          id
+          name
+          email
+        }
+        token
+        tokenExp
 			} 
 		}`,
 			&resp,
@@ -33,7 +37,7 @@ var _ = Describe("resolverCustomerRequestAccess", func() {
 		return resp, err
 	}
 
-	It("creates a user", func() {
+	It("register a user", func() {
 		id := uuid.New()
 		input := genGraphql.CreateUserInput{
 			Name:     "Matt",
@@ -56,13 +60,16 @@ var _ = Describe("resolverCustomerRequestAccess", func() {
 		)
 		Expect(err).ToNot(HaveOccurred())
 
-		Expect(resp.CreateUser.ID).To(Equal(id.String()))
-		Expect(resp.CreateUser.Name).To(Equal(input.Name))
-		Expect(resp.CreateUser.Email).To(Equal(input.Email))
-		Expect(resp.CreateUser.Password).To(BeNil())
-		Expect(resp.CreateUser.CreatedAt).ToNot(BeNil())
-		Expect(resp.CreateUser.UpdatedAt).ToNot(BeNil())
-		Expect(resp.CreateUser.DeletedAt).To(BeNil())
+		Expect(resp.Register.User.ID).To(Equal(id.String()))
+		Expect(resp.Register.User.Name).To(Equal(input.Name))
+		Expect(resp.Register.User.Email).To(Equal(input.Email))
+		Expect(resp.Register.User.Password).To(BeNil())
+		Expect(resp.Register.User.CreatedAt).ToNot(BeNil())
+		Expect(resp.Register.User.UpdatedAt).ToNot(BeNil())
+		Expect(resp.Register.User.DeletedAt).To(BeNil())
+
+		Expect(resp.Register.Token).ToNot(BeNil())
+		Expect(resp.Register.TokenExp).ToNot(BeNil())
 	})
 
 	It("returns an error if email is invalid", func() {

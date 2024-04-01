@@ -28,14 +28,19 @@ func Middleware(userService user.Service) func(http.Handler) http.Handler {
 
 			//validate jwt token
 			tokenStr := header
-			userID, err := jwt.ParseToken(tokenStr)
+			jwtClaims, err := jwt.ParseToken(tokenStr)
 			if err != nil {
 				http.Error(w, "Invalid token", http.StatusForbidden)
 				return
 			}
 
+			if jwt.TokenExpired(int64(jwtClaims.Exp)) {
+				http.Error(w, "Token expired", http.StatusForbidden)
+				return
+			}
+
 			// create user and check if user exists in db
-			userIDStr, err := uuid.Parse(userID)
+			userIDStr, err := uuid.Parse(jwtClaims.UserID)
 			if err != nil {
 				http.Error(w, "Invalid token", http.StatusForbidden)
 				return
@@ -47,7 +52,7 @@ func Middleware(userService user.Service) func(http.Handler) http.Handler {
 				return
 			}
 			// put it in context
-			ctx := context.WithValue(r.Context(), userIdKey, userID)
+			ctx := context.WithValue(r.Context(), userIdKey, jwtClaims.UserID)
 
 			// and call the next with our new context
 			r = r.WithContext(ctx)
