@@ -81,6 +81,65 @@ func (_c *MockRepository_Create_Call) RunAndReturn(run func(context.Context, use
 	return _c
 }
 
+// GetByEmail provides a mock function with given fields: ctx, email
+func (_m *MockRepository) GetByEmail(ctx context.Context, email string) (*user.User, error) {
+	ret := _m.Called(ctx, email)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetByEmail")
+	}
+
+	var r0 *user.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*user.User, error)); ok {
+		return rf(ctx, email)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) *user.User); ok {
+		r0 = rf(ctx, email)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*user.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, email)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockRepository_GetByEmail_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByEmail'
+type MockRepository_GetByEmail_Call struct {
+	*mock.Call
+}
+
+// GetByEmail is a helper method to define mock.On call
+//   - ctx context.Context
+//   - email string
+func (_e *MockRepository_Expecter) GetByEmail(ctx interface{}, email interface{}) *MockRepository_GetByEmail_Call {
+	return &MockRepository_GetByEmail_Call{Call: _e.mock.On("GetByEmail", ctx, email)}
+}
+
+func (_c *MockRepository_GetByEmail_Call) Run(run func(ctx context.Context, email string)) *MockRepository_GetByEmail_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *MockRepository_GetByEmail_Call) Return(_a0 *user.User, _a1 error) *MockRepository_GetByEmail_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockRepository_GetByEmail_Call) RunAndReturn(run func(context.Context, string) (*user.User, error)) *MockRepository_GetByEmail_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetByID provides a mock function with given fields: ctx, id
 func (_m *MockRepository) GetByID(ctx context.Context, id string) (*user.User, error) {
 	ret := _m.Called(ctx, id)

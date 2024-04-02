@@ -21,7 +21,7 @@ func (s *Service) Create(u User, ctx context.Context) (*User, error) {
 		return nil, err
 	}
 
-	hashedPassword, err := hashPassword(*u.Password)
+	hashedPassword, err := HashPassword(*u.Password)
 	if err != nil {
 		logger.Error("error hashing password", err)
 		return nil, err
@@ -34,4 +34,14 @@ func (s *Service) Create(u User, ctx context.Context) (*User, error) {
 
 func (s *Service) GetByID(id uuid.UUID, ctx context.Context) (*User, error) {
 	return s.Repository.GetByID(ctx, id.String())
+}
+
+func (s *Service) GetByEmail(email string, ctx context.Context) (*User, error) {
+	user, err := s.Repository.GetByEmail(ctx, email)
+	if err != nil {
+		logger.Error("error getting user by email", err)
+		return nil, ErrInvalidCredentials
+	}
+
+	return user, nil
 }

@@ -32,3 +32,25 @@ func (s *Service) Register(ctx context.Context, user user.User) (*Response, erro
 		TokenExp: exp,
 	}, nil
 }
+
+func (s *Service) Login(ctx context.Context, email, password string) (*Response, error) {
+	loggedUser, err := s.UserService.GetByEmail(email, ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if !user.CheckPasswordHash(password, *loggedUser.Password) {
+		return nil, user.ErrInvalidCredentials
+	}
+
+	token, exp, err := jwt.GenerateToken(loggedUser.ID.String())
+	if err != nil {
+		return nil, err
+	}
+
+	return &Response{
+		User:     *loggedUser,
+		Token:    token,
+		TokenExp: exp,
+	}, nil
+}

@@ -6,7 +6,6 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
 
 	graphql1 "github.com/anti-duhring/autojud/internal/generated/graphql"
 	"github.com/anti-duhring/autojud/internal/user"
@@ -14,7 +13,23 @@ import (
 
 // Login is the resolver for the Login field.
 func (r *mutationResolver) Login(ctx context.Context, email string, password string) (*graphql1.AuthResponse, error) {
-	panic(fmt.Errorf("not implemented: Login - Login"))
+	response, err := r.AuthService.Login(ctx, email, password)
+	if err != nil {
+		return nil, err
+	}
+
+	return &graphql1.AuthResponse{
+		User: &graphql1.User{
+			ID:        response.User.ID.String(),
+			Name:      response.User.Name,
+			Email:     response.User.Email,
+			CreatedAt: response.User.CreatedAt,
+			UpdatedAt: response.User.UpdatedAt,
+			DeletedAt: response.User.DeletedAt,
+		},
+		Token:    response.Token,
+		TokenExp: float64(response.TokenExp),
+	}, nil
 }
 
 // Register is the resolver for the Register field.
@@ -43,4 +58,3 @@ func (r *mutationResolver) Register(ctx context.Context, input graphql1.CreateUs
 		TokenExp: float64(response.TokenExp),
 	}, nil
 }
-

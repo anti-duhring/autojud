@@ -8,6 +8,7 @@ import (
 type Repository interface {
 	Create(ctx context.Context, user User) (*User, error)
 	GetByID(ctx context.Context, id string) (*User, error)
+	GetByEmail(ctx context.Context, email string) (*User, error)
 }
 
 type RepositoryPostgres struct {
@@ -35,6 +36,18 @@ func (r *RepositoryPostgres) GetByID(ctx context.Context, id string) (*User, err
 
 	query := `SELECT * FROM users WHERE id = $1;`
 	err := r.DB.QueryRowContext(ctx, query, id).Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (r *RepositoryPostgres) GetByEmail(ctx context.Context, email string) (*User, error) {
+	var user User
+
+	query := `SELECT * FROM users WHERE email = $1;`
+	err := r.DB.QueryRowContext(ctx, query, email).Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
 	if err != nil {
 		return nil, err
 	}

@@ -16,6 +16,7 @@ import (
 )
 
 var c *client.Client
+var server *handler.Server
 var userRepo user.Repository
 
 func Test(t *testing.T) {
@@ -31,7 +32,7 @@ var _ = BeforeSuite(func() {
 	userService := user.NewService(userRepo)
 	authService := auth.NewService(*userService)
 
-	server := handler.NewDefaultServer(genGraphql.NewExecutableSchema(genGraphql.Config{Resolvers: &resolvers.Resolver{
+	server = handler.NewDefaultServer(genGraphql.NewExecutableSchema(genGraphql.Config{Resolvers: &resolvers.Resolver{
 		UserService: userService,
 		AuthService: authService,
 	}}))
