@@ -9,4 +9,5 @@ var (
 	ErrEmailInvalid       = errors.New("Email is invalid")
 	ErrInternal           = errors.New("Internal error")
 	ErrInvalidCredentials = errors.New("Invalid credentials")
+	ErrInvalidID          = errors.New("Invalid ID")
 )

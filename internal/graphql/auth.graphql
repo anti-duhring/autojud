@@ -6,8 +6,14 @@ type AuthResponse {
   tokenExp: Float!
 }
 
+input CreateUserInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
 extend type Mutation {
-  Login(email: String!, password: String!): AuthResponse! @goField(forceResolver: true)
-  Register(input: CreateUserInput!): AuthResponse! @goField(forceResolver: true)
+  Login(email: String!, password: String!): AuthResponse! 
+  Register(input: CreateUserInput!): AuthResponse! 
 }
 

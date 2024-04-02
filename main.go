@@ -19,6 +19,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer db.Close()
 
 	userRepo := user.NewRepositoryPostgres(db)
 	userService := user.NewService(userRepo)
@@ -27,10 +28,13 @@ func main() {
 	router := chi.NewRouter()
 	router.Use(auth.Middleware(*userService))
 
-	srv := handler.NewDefaultServer(genGraphql.NewExecutableSchema(genGraphql.Config{Resolvers: &resolvers.Resolver{
+	c := genGraphql.Config{Resolvers: &resolvers.Resolver{
 		UserService: userService,
 		AuthService: authService,
-	}}))
+	}}
+	c.Directives.Auth = auth.AuthDirective
+
+	srv := handler.NewDefaultServer(genGraphql.NewExecutableSchema(c))
 
 	port := os.Getenv("API_PORT")
 	if port == "" {

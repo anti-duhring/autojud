@@ -41,6 +41,7 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
+	Auth func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -53,7 +54,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		Login      func(childComplexity int, email string, password string) int
 		Register   func(childComplexity int, input CreateUserInput) int
-		UpdateUser func(childComplexity int, id string, input CreateUserInput) int
+		UpdateUser func(childComplexity int, input UpdateUserInput) int
 	}
 
 	Query struct {
@@ -71,7 +72,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	UpdateUser(ctx context.Context, id string, input CreateUserInput) (*User, error)
+	UpdateUser(ctx context.Context, input UpdateUserInput) (*User, error)
 	Login(ctx context.Context, email string, password string) (*AuthResponse, error)
 	Register(ctx context.Context, input CreateUserInput) (*AuthResponse, error)
 }
@@ -150,7 +151,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateUser(childComplexity, args["id"].(string), args["input"].(CreateUserInput)), true
+		return e.complexity.Mutation.UpdateUser(childComplexity, args["input"].(UpdateUserInput)), true
 
 	case "User.createdAt":
 		if e.complexity.User.CreatedAt == nil {
@@ -210,6 +211,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateUserInput,
+		ec.unmarshalInputUpdateUserInput,
 	)
 	first := true
 
@@ -315,13 +317,20 @@ type AuthResponse {
   tokenExp: Float!
 }
 
+input CreateUserInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
 extend type Mutation {
-  Login(email: String!, password: String!): AuthResponse! @goField(forceResolver: true)
-  Register(input: CreateUserInput!): AuthResponse! @goField(forceResolver: true)
+  Login(email: String!, password: String!): AuthResponse! 
+  Register(input: CreateUserInput!): AuthResponse! 
 }
 
 `, BuiltIn: false},
 	{Name: "../../graphql/directives.graphql", Input: `directive @goField(forceResolver: Boolean, name: String) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+directive @auth on FIELD_DEFINITION
 `, BuiltIn: false},
 	{Name: "../../graphql/user.graphql", Input: `type User {
   id: ID!
@@ -333,14 +342,15 @@ extend type Mutation {
   deletedAt: String
 }
 
-input CreateUserInput {
-  name: String!
-  email: String!
-  password: String!
+input UpdateUserInput {
+  name: String
+  email: String
+  password: String
 }
 
+
 type Mutation {
-  UpdateUser(id: ID!, input: CreateUserInput!): User!
+  UpdateUser(input: UpdateUserInput!): User! @auth
 }
 `, BuiltIn: false},
 }
@@ -392,24 +402,15 @@ func (ec *executionContext) field_Mutation_Register_args(ctx context.Context, ra
 func (ec *executionContext) field_Mutation_UpdateUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	var arg1 CreateUserInput
+	var arg0 UpdateUserInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNCreateUserInput2githubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐCreateUserInput(ctx, tmp)
+		arg0, err = ec.unmarshalNUpdateUserInput2githubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐUpdateUserInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["input"] = arg1
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -627,8 +628,28 @@ func (ec *executionContext) _Mutation_UpdateUser(ctx context.Context, field grap
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateUser(rctx, fc.Args["id"].(string), fc.Args["input"].(CreateUserInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateUser(rctx, fc.Args["input"].(UpdateUserInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*User); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/anti-duhring/autojud/internal/generated/graphql.User`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3056,6 +3077,47 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, obj interface{}) (UpdateUserInput, error) {
+	var it UpdateUserInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "email", "password"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "email":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Email = data
+		case "password":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Password = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -3692,6 +3754,11 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNUpdateUserInput2githubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐUpdateUserInput(ctx context.Context, v interface{}) (UpdateUserInput, error) {
+	res, err := ec.unmarshalInputUpdateUserInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNUser2githubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐUser(ctx context.Context, sel ast.SelectionSet, v User) graphql.Marshaler {

@@ -8,12 +8,44 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/anti-duhring/autojud/internal/auth"
 	graphql1 "github.com/anti-duhring/autojud/internal/generated/graphql"
+	"github.com/anti-duhring/autojud/internal/user"
+	"github.com/google/uuid"
 )
 
 // UpdateUser is the resolver for the updateUser field.
-func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input graphql1.CreateUserInput) (*graphql1.User, error) {
-	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))
+func (r *mutationResolver) UpdateUser(ctx context.Context, input graphql1.UpdateUserInput) (*graphql1.User, error) {
+	id := auth.GetUserID(ctx)
+	if id == "" {
+		return nil, fmt.Errorf("Access Denied")
+	}
+
+	uID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	user := &user.User{
+		ID:       uID,
+		Email:    *input.Email,
+		Password: input.Password,
+		Name:     *input.Name,
+	}
+
+	updatedUser, err := r.UserService.Update(*user, ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &graphql1.User{
+		ID:        updatedUser.ID.String(),
+		Email:     updatedUser.Email,
+		Name:      updatedUser.Name,
+		CreatedAt: updatedUser.CreatedAt,
+		UpdatedAt: updatedUser.UpdatedAt,
+		DeletedAt: updatedUser.DeletedAt,
+	}, nil
 }
 
 // Mutation returns graphql1.MutationResolver implementation.

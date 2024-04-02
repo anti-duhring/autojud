@@ -32,9 +32,12 @@ var _ = BeforeSuite(func() {
 	userService := user.NewService(userRepo)
 	authService := auth.NewService(*userService)
 
-	server = handler.NewDefaultServer(genGraphql.NewExecutableSchema(genGraphql.Config{Resolvers: &resolvers.Resolver{
+	config := genGraphql.Config{Resolvers: &resolvers.Resolver{
 		UserService: userService,
 		AuthService: authService,
-	}}))
+	}}
+	config.Directives.Auth = auth.AuthDirective
+
+	server = handler.NewDefaultServer(genGraphql.NewExecutableSchema(config))
 	c = client.New(server)
 })

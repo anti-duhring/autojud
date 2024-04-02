@@ -9,6 +9,7 @@ type Repository interface {
 	Create(ctx context.Context, user User) (*User, error)
 	GetByID(ctx context.Context, id string) (*User, error)
 	GetByEmail(ctx context.Context, email string) (*User, error)
+	Update(ctx context.Context, user User) (*User, error)
 }
 
 type RepositoryPostgres struct {
@@ -53,4 +54,16 @@ func (r *RepositoryPostgres) GetByEmail(ctx context.Context, email string) (*Use
 	}
 
 	return &user, nil
+}
+
+func (r *RepositoryPostgres) Update(ctx context.Context, user User) (*User, error) {
+	var updatedUser User
+
+	query := `UPDATE users SET name = $1, email = $2, password = $3 WHERE id = $4 RETURNING id, name, email, password, created_at, updated_at, deleted_at;`
+	err := r.DB.QueryRowContext(ctx, query, user.Name, user.Email, user.Password, user.ID).Scan(&updatedUser.ID, &updatedUser.Name, &updatedUser.Email, &updatedUser.Password, &updatedUser.CreatedAt, &updatedUser.UpdatedAt, &updatedUser.DeletedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &updatedUser, nil
 }

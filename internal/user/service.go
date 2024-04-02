@@ -51,3 +51,22 @@ func (s *Service) GetByEmail(email string, ctx context.Context) (*User, error) {
 
 	return user, nil
 }
+
+func (s *Service) Update(u User, ctx context.Context) (*User, error) {
+	err := u.Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	if u.ID == uuid.Nil {
+		return nil, ErrInvalidID
+	}
+
+	updatedUser, err := s.Repository.Update(ctx, u)
+	if err != nil {
+		logger.Error("error updating user", err)
+		return nil, ErrInternal
+	}
+
+	return updatedUser, nil
+}

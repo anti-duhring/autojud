@@ -9,12 +9,6 @@ import (
 	"github.com/google/uuid"
 )
 
-var userIdKey = &contextKey{"user"}
-
-type contextKey struct {
-	name string
-}
-
 func Middleware(userService user.Service) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -52,17 +46,13 @@ func Middleware(userService user.Service) func(http.Handler) http.Handler {
 				return
 			}
 			// put it in context
-			ctx := context.WithValue(r.Context(), userIdKey, jwtClaims.UserID)
+			ctx := context.Background()
+			SaveUserID(ctx, jwtClaims.UserID)
+			SaveToken(ctx, tokenStr)
 
 			// and call the next with our new context
 			r = r.WithContext(ctx)
 			next.ServeHTTP(w, r)
 		})
 	}
-}
-
-// ForContext finds the user from the context. REQUIRES Middleware to have run.
-func ForContext(ctx context.Context) *user.User {
-	raw, _ := ctx.Value(userIdKey).(*user.User)
-	return raw
 }

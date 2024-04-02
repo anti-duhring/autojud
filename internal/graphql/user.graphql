@@ -8,12 +8,13 @@ type User {
   deletedAt: String
 }
 
-input CreateUserInput {
-  name: String!
-  email: String!
-  password: String!
+input UpdateUserInput {
+  name: String
+  email: String
+  password: String
 }
 
+
 type Mutation {
-  UpdateUser(id: ID!, input: CreateUserInput!): User!
+  UpdateUser(input: UpdateUserInput!): User! @auth
 }
