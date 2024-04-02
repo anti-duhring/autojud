@@ -29,7 +29,13 @@ func (s *Service) Create(u User, ctx context.Context) (*User, error) {
 
 	u.Password = &hashedPassword
 
-	return s.Repository.Create(ctx, u)
+	createdUser, err := s.Repository.Create(ctx, u)
+	if err != nil {
+		logger.Error("error creating user", err)
+		return nil, ErrInternal
+	}
+
+	return createdUser, nil
 }
 
 func (s *Service) GetByID(id uuid.UUID, ctx context.Context) (*User, error) {

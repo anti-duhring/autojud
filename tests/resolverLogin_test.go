@@ -73,7 +73,7 @@ var _ = Describe("resolverLogin", func() {
 		Expect(resp.Login.TokenExp).ToNot(BeNil())
 	})
 
-	FIt("throws an error if password is wrong", func() {
+	It("throws an error if password is wrong", func() {
 		id := uuid.New()
 		name := "Matt"
 		email := "matt@mail.com"
