@@ -1,6 +1,8 @@
 package auth
 
-import "context"
+import (
+	"context"
+)
 
 var userIdKey = &contextKey{"userKey"}
 

@@ -26,14 +26,23 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input graphql1.Update
 		return nil, err
 	}
 
-	user := &user.User{
-		ID:       uID,
-		Email:    *input.Email,
-		Password: input.Password,
-		Name:     *input.Name,
+	email := ""
+	if input.Email != nil {
+		email = *input.Email
 	}
 
-	updatedUser, err := r.UserService.Update(*user, ctx)
+	name := ""
+	if input.Name != nil {
+		name = *input.Name
+	}
+
+	user := &user.User{
+		Email:    email,
+		Password: input.Password,
+		Name:     name,
+	}
+
+	updatedUser, err := r.UserService.Update(uID, *user, ctx)
 	if err != nil {
 		return nil, err
 	}

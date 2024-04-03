@@ -52,14 +52,27 @@ func (s *Service) GetByEmail(email string, ctx context.Context) (*User, error) {
 	return user, nil
 }
 
-func (s *Service) Update(u User, ctx context.Context) (*User, error) {
-	err := u.Validate()
-	if err != nil {
-		return nil, err
+func (s *Service) Update(id uuid.UUID, u User, ctx context.Context) (*User, error) {
+	if id == uuid.Nil {
+		return nil, ErrInvalidID
 	}
 
-	if u.ID == uuid.Nil {
-		return nil, ErrInvalidID
+	u.ID = id
+
+	oldUser, err := s.Repository.GetByID(ctx, id.String())
+	if err != nil {
+		logger.Error("error getting user by id", err)
+		return nil, ErrInternal
+	}
+
+	if u.Name == "" {
+		u.Name = oldUser.Name
+	}
+	if u.Email == "" {
+		u.Email = oldUser.Email
+	}
+	if u.Password == nil {
+		u.Password = oldUser.Password
 	}
 
 	updatedUser, err := s.Repository.Update(ctx, u)

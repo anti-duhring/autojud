@@ -1,11 +1,11 @@
 package auth
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/anti-duhring/autojud/internal/user"
 	"github.com/anti-duhring/autojud/pkg/jwt"
+	"github.com/anti-duhring/goncurrency/pkg/logger"
 	"github.com/google/uuid"
 )
 
@@ -13,6 +13,9 @@ func Middleware(userService user.Service) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			header := r.Header.Get("Authorization")
+
+			ctx := r.Context()
+			r = r.WithContext(ctx)
 
 			// Allow unauthenticated users in
 			if header == "" {
@@ -24,6 +27,7 @@ func Middleware(userService user.Service) func(http.Handler) http.Handler {
 			tokenStr := header
 			jwtClaims, err := jwt.ParseToken(tokenStr)
 			if err != nil {
+				logger.Error("error parsing token", err)
 				http.Error(w, "Invalid token", http.StatusForbidden)
 				return
 			}
@@ -46,9 +50,8 @@ func Middleware(userService user.Service) func(http.Handler) http.Handler {
 				return
 			}
 			// put it in context
-			ctx := context.Background()
-			SaveUserID(ctx, jwtClaims.UserID)
-			SaveToken(ctx, tokenStr)
+			ctx = SaveUserID(ctx, jwtClaims.UserID)
+			ctx = SaveToken(ctx, tokenStr)
 
 			// and call the next with our new context
 			r = r.WithContext(ctx)
