@@ -78,7 +78,7 @@ var _ = Describe("resolverUpdateUser", func() {
 		Expect(resp.UpdateUser.Name).To(Equal(name))
 		Expect(resp.UpdateUser.Email).To(Equal(email))
 	})
-	FIt("updates only the user's email", func() {
+	It("updates only user's email", func() {
 		id := uuid.New()
 		name := "Matt"
 		newEmail := "matt@mail.com"
