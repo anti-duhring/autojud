@@ -1,0 +1,21 @@
+
+type Process  {
+  id: ID!
+  processNumber: String!
+  court: Court!
+  origin: String
+  judge: String
+  activePart: String
+  passivePart: String
+  createdAt: String!
+  updatedAt: String!
+  deletedAt: String
+}
+
+enum Court {
+  TJPE
+}
+
+extend type Mutation {
+ FollowProcess(processNumber: String!): Process! @auth
+}

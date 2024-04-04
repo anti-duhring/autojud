@@ -52,9 +52,23 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		Login      func(childComplexity int, email string, password string) int
-		Register   func(childComplexity int, input CreateUserInput) int
-		UpdateUser func(childComplexity int, input UpdateUserInput) int
+		FollowProcess func(childComplexity int, processNumber string) int
+		Login         func(childComplexity int, email string, password string) int
+		Register      func(childComplexity int, input CreateUserInput) int
+		UpdateUser    func(childComplexity int, input UpdateUserInput) int
+	}
+
+	Process struct {
+		ActivePart    func(childComplexity int) int
+		Court         func(childComplexity int) int
+		CreatedAt     func(childComplexity int) int
+		DeletedAt     func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Judge         func(childComplexity int) int
+		Origin        func(childComplexity int) int
+		PassivePart   func(childComplexity int) int
+		ProcessNumber func(childComplexity int) int
+		UpdatedAt     func(childComplexity int) int
 	}
 
 	Query struct {
@@ -75,6 +89,7 @@ type MutationResolver interface {
 	UpdateUser(ctx context.Context, input UpdateUserInput) (*User, error)
 	Login(ctx context.Context, email string, password string) (*AuthResponse, error)
 	Register(ctx context.Context, input CreateUserInput) (*AuthResponse, error)
+	FollowProcess(ctx context.Context, processNumber string) (*Process, error)
 }
 
 type executableSchema struct {
@@ -117,6 +132,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AuthResponse.User(childComplexity), true
 
+	case "Mutation.FollowProcess":
+		if e.complexity.Mutation.FollowProcess == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_FollowProcess_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.FollowProcess(childComplexity, args["processNumber"].(string)), true
+
 	case "Mutation.Login":
 		if e.complexity.Mutation.Login == nil {
 			break
@@ -152,6 +179,76 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateUser(childComplexity, args["input"].(UpdateUserInput)), true
+
+	case "Process.activePart":
+		if e.complexity.Process.ActivePart == nil {
+			break
+		}
+
+		return e.complexity.Process.ActivePart(childComplexity), true
+
+	case "Process.court":
+		if e.complexity.Process.Court == nil {
+			break
+		}
+
+		return e.complexity.Process.Court(childComplexity), true
+
+	case "Process.createdAt":
+		if e.complexity.Process.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Process.CreatedAt(childComplexity), true
+
+	case "Process.deletedAt":
+		if e.complexity.Process.DeletedAt == nil {
+			break
+		}
+
+		return e.complexity.Process.DeletedAt(childComplexity), true
+
+	case "Process.id":
+		if e.complexity.Process.ID == nil {
+			break
+		}
+
+		return e.complexity.Process.ID(childComplexity), true
+
+	case "Process.judge":
+		if e.complexity.Process.Judge == nil {
+			break
+		}
+
+		return e.complexity.Process.Judge(childComplexity), true
+
+	case "Process.origin":
+		if e.complexity.Process.Origin == nil {
+			break
+		}
+
+		return e.complexity.Process.Origin(childComplexity), true
+
+	case "Process.passivePart":
+		if e.complexity.Process.PassivePart == nil {
+			break
+		}
+
+		return e.complexity.Process.PassivePart(childComplexity), true
+
+	case "Process.processNumber":
+		if e.complexity.Process.ProcessNumber == nil {
+			break
+		}
+
+		return e.complexity.Process.ProcessNumber(childComplexity), true
+
+	case "Process.updatedAt":
+		if e.complexity.Process.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Process.UpdatedAt(childComplexity), true
 
 	case "User.createdAt":
 		if e.complexity.User.CreatedAt == nil {
@@ -332,6 +429,28 @@ extend type Mutation {
 	{Name: "../../graphql/directives.graphql", Input: `directive @goField(forceResolver: Boolean, name: String) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
 directive @auth on FIELD_DEFINITION
 `, BuiltIn: false},
+	{Name: "../../graphql/process.graphql", Input: `
+type Process  {
+  id: ID!
+  processNumber: String!
+  court: Court!
+  origin: String
+  judge: String
+  activePart: String
+  passivePart: String
+  createdAt: String!
+  updatedAt: String!
+  deletedAt: String
+}
+
+enum Court {
+  TJPE
+}
+
+extend type Mutation {
+ FollowProcess(processNumber: String!): Process! @auth
+}
+`, BuiltIn: false},
 	{Name: "../../graphql/user.graphql", Input: `type User {
   id: ID!
   name: String!
@@ -359,6 +478,21 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_FollowProcess_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["processNumber"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("processNumber"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["processNumber"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_Login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -828,6 +962,528 @@ func (ec *executionContext) fieldContext_Mutation_Register(ctx context.Context, 
 	if fc.Args, err = ec.field_Mutation_Register_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_FollowProcess(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_FollowProcess(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().FollowProcess(rctx, fc.Args["processNumber"].(string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*Process); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/anti-duhring/autojud/internal/generated/graphql.Process`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*Process)
+	fc.Result = res
+	return ec.marshalNProcess2ᚖgithubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐProcess(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_FollowProcess(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Process_id(ctx, field)
+			case "processNumber":
+				return ec.fieldContext_Process_processNumber(ctx, field)
+			case "court":
+				return ec.fieldContext_Process_court(ctx, field)
+			case "origin":
+				return ec.fieldContext_Process_origin(ctx, field)
+			case "judge":
+				return ec.fieldContext_Process_judge(ctx, field)
+			case "activePart":
+				return ec.fieldContext_Process_activePart(ctx, field)
+			case "passivePart":
+				return ec.fieldContext_Process_passivePart(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Process_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Process_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Process_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Process", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_FollowProcess_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Process_id(ctx context.Context, field graphql.CollectedField, obj *Process) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Process_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Process_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Process",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Process_processNumber(ctx context.Context, field graphql.CollectedField, obj *Process) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Process_processNumber(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProcessNumber, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Process_processNumber(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Process",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Process_court(ctx context.Context, field graphql.CollectedField, obj *Process) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Process_court(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Court, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(Court)
+	fc.Result = res
+	return ec.marshalNCourt2githubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐCourt(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Process_court(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Process",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Court does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Process_origin(ctx context.Context, field graphql.CollectedField, obj *Process) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Process_origin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Origin, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Process_origin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Process",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Process_judge(ctx context.Context, field graphql.CollectedField, obj *Process) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Process_judge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Judge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Process_judge(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Process",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Process_activePart(ctx context.Context, field graphql.CollectedField, obj *Process) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Process_activePart(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ActivePart, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Process_activePart(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Process",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Process_passivePart(ctx context.Context, field graphql.CollectedField, obj *Process) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Process_passivePart(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PassivePart, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Process_passivePart(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Process",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Process_createdAt(ctx context.Context, field graphql.CollectedField, obj *Process) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Process_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Process_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Process",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Process_updatedAt(ctx context.Context, field graphql.CollectedField, obj *Process) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Process_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Process_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Process",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Process_deletedAt(ctx context.Context, field graphql.CollectedField, obj *Process) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Process_deletedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Process_deletedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Process",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
 	}
 	return fc, nil
 }
@@ -3215,6 +3871,82 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "FollowProcess":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_FollowProcess(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var processImplementors = []string{"Process"}
+
+func (ec *executionContext) _Process(ctx context.Context, sel ast.SelectionSet, obj *Process) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, processImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Process")
+		case "id":
+			out.Values[i] = ec._Process_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "processNumber":
+			out.Values[i] = ec._Process_processNumber(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "court":
+			out.Values[i] = ec._Process_court(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "origin":
+			out.Values[i] = ec._Process_origin(ctx, field, obj)
+		case "judge":
+			out.Values[i] = ec._Process_judge(ctx, field, obj)
+		case "activePart":
+			out.Values[i] = ec._Process_activePart(ctx, field, obj)
+		case "passivePart":
+			out.Values[i] = ec._Process_passivePart(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._Process_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._Process_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deletedAt":
+			out.Values[i] = ec._Process_deletedAt(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3706,6 +4438,16 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNCourt2githubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐCourt(ctx context.Context, v interface{}) (Court, error) {
+	var res Court
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCourt2githubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐCourt(ctx context.Context, sel ast.SelectionSet, v Court) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) unmarshalNCreateUserInput2githubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐCreateUserInput(ctx context.Context, v interface{}) (CreateUserInput, error) {
 	res, err := ec.unmarshalInputCreateUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3739,6 +4481,20 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNProcess2githubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐProcess(ctx context.Context, sel ast.SelectionSet, v Process) graphql.Marshaler {
+	return ec._Process(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProcess2ᚖgithubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐProcess(ctx context.Context, sel ast.SelectionSet, v *Process) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Process(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

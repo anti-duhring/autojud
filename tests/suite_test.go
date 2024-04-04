@@ -9,7 +9,7 @@ import (
 	"github.com/anti-duhring/autojud/internal/auth"
 	genGraphql "github.com/anti-duhring/autojud/internal/generated/graphql"
 	"github.com/anti-duhring/autojud/internal/graphql/resolvers"
-	"github.com/anti-duhring/autojud/internal/user"
+	"github.com/anti-duhring/autojud/internal/users"
 	"github.com/anti-duhring/autojud/tests/mocks"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -17,7 +17,7 @@ import (
 
 var c *client.Client
 var server *handler.Server
-var userRepo user.Repository
+var userRepo users.Repository
 
 func Test(t *testing.T) {
 	os.Setenv("TZ", "UTC")
@@ -29,7 +29,7 @@ func Test(t *testing.T) {
 var _ = BeforeSuite(func() {
 	t := GinkgoT()
 	userRepo = mocks.NewMockRepository(t)
-	userService := user.NewService(userRepo)
+	userService := users.NewService(userRepo)
 	authService := auth.NewService(*userService)
 
 	config := genGraphql.Config{Resolvers: &resolvers.Resolver{

@@ -5,7 +5,7 @@ import (
 
 	"github.com/99designs/gqlgen/client"
 	genGraphql "github.com/anti-duhring/autojud/internal/generated/graphql"
-	"github.com/anti-duhring/autojud/internal/user"
+	"github.com/anti-duhring/autojud/internal/users"
 	"github.com/anti-duhring/autojud/tests/mocks"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
@@ -45,7 +45,7 @@ var _ = Describe("resolverRegister", func() {
 			Password: "password",
 		}
 
-		userRepo.(*mocks.MockRepository).Mock.On("Create", mock.Anything, mock.Anything).Return(&user.User{
+		userRepo.(*mocks.MockRepository).Mock.On("Create", mock.Anything, mock.Anything).Return(&users.User{
 			ID:        id,
 			Name:      input.Name,
 			Email:     input.Email,
@@ -83,7 +83,7 @@ var _ = Describe("resolverRegister", func() {
 			client.Var("input", input),
 		)
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError(ContainSubstring(user.ErrEmailInvalid.Error())))
+		Expect(err).To(MatchError(ContainSubstring(users.ErrEmailInvalid.Error())))
 	})
 
 	It("returns an error if password is empty", func() {
@@ -97,7 +97,7 @@ var _ = Describe("resolverRegister", func() {
 			client.Var("input", input),
 		)
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError(ContainSubstring(user.ErrPasswordEmpty.Error())))
+		Expect(err).To(MatchError(ContainSubstring(users.ErrPasswordEmpty.Error())))
 	})
 
 	It("returns an error if name is empty", func() {
@@ -111,7 +111,7 @@ var _ = Describe("resolverRegister", func() {
 			client.Var("input", input),
 		)
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError(ContainSubstring(user.ErrNameEmpty.Error())))
+		Expect(err).To(MatchError(ContainSubstring(users.ErrNameEmpty.Error())))
 	})
 
 })

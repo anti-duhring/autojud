@@ -6,7 +6,7 @@ import (
 
 	"github.com/99designs/gqlgen/client"
 	genGraphql "github.com/anti-duhring/autojud/internal/generated/graphql"
-	"github.com/anti-duhring/autojud/internal/user"
+	"github.com/anti-duhring/autojud/internal/users"
 	"github.com/anti-duhring/autojud/tests/mocks"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
@@ -43,9 +43,9 @@ var _ = Describe("resolverLogin", func() {
 		name := "Matt"
 		email := "matt@mail.com"
 		password := "password"
-		encryptedPassword, _ := user.HashPassword(password)
+		encryptedPassword, _ := users.HashPassword(password)
 
-		userRepo.(*mocks.MockRepository).Mock.On("GetByEmail", mock.Anything, mock.Anything).Return(&user.User{
+		userRepo.(*mocks.MockRepository).Mock.On("GetByEmail", mock.Anything, mock.Anything).Return(&users.User{
 			ID:        id,
 			Name:      name,
 			Email:     email,
@@ -78,9 +78,9 @@ var _ = Describe("resolverLogin", func() {
 		name := "Matt"
 		email := "matt@mail.com"
 		password := "wrongpassword"
-		encryptedPassword, _ := user.HashPassword("password")
+		encryptedPassword, _ := users.HashPassword("password")
 
-		userRepo.(*mocks.MockRepository).Mock.On("GetByEmail", mock.Anything, mock.Anything).Return(&user.User{
+		userRepo.(*mocks.MockRepository).Mock.On("GetByEmail", mock.Anything, mock.Anything).Return(&users.User{
 			ID:        id,
 			Name:      name,
 			Email:     email,
@@ -96,7 +96,7 @@ var _ = Describe("resolverLogin", func() {
 		)
 		Expect(err).To(HaveOccurred())
 
-		Expect(err).To(MatchError(ContainSubstring(user.ErrInvalidCredentials.Error())))
+		Expect(err).To(MatchError(ContainSubstring(users.ErrInvalidCredentials.Error())))
 	})
 
 	It("returns an error if the user does not exist", func() {
@@ -111,6 +111,6 @@ var _ = Describe("resolverLogin", func() {
 		)
 		Expect(err).To(HaveOccurred())
 
-		Expect(err).To(MatchError(ContainSubstring(user.ErrInvalidCredentials.Error())))
+		Expect(err).To(MatchError(ContainSubstring(users.ErrInvalidCredentials.Error())))
 	})
 })

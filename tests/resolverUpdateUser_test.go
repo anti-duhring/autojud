@@ -5,7 +5,7 @@ import (
 
 	"github.com/99designs/gqlgen/client"
 	genGraphql "github.com/anti-duhring/autojud/internal/generated/graphql"
-	"github.com/anti-duhring/autojud/internal/user"
+	"github.com/anti-duhring/autojud/internal/users"
 	"github.com/anti-duhring/autojud/tests/mocks"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
@@ -38,8 +38,8 @@ var _ = Describe("resolverUpdateUser", func() {
 		name := "Matt"
 		email := "matt@mail.com"
 		password := "password"
-		encryptedPassword, _ := user.HashPassword(password)
-		oldEncryptedPassword, _ := user.HashPassword("oldpassword")
+		encryptedPassword, _ := users.HashPassword(password)
+		oldEncryptedPassword, _ := users.HashPassword("oldpassword")
 
 		input := &genGraphql.UpdateUserInput{
 			Name:     &name,
@@ -47,7 +47,7 @@ var _ = Describe("resolverUpdateUser", func() {
 			Password: &password,
 		}
 
-		userRepo.(*mocks.MockRepository).Mock.On("GetByID", mock.Anything, mock.Anything).Return(&user.User{
+		userRepo.(*mocks.MockRepository).Mock.On("GetByID", mock.Anything, mock.Anything).Return(&users.User{
 			ID:        id,
 			Name:      "Tom",
 			Email:     "tombrady@nepatrios.com",
@@ -57,7 +57,7 @@ var _ = Describe("resolverUpdateUser", func() {
 			DeletedAt: nil,
 		}, nil)
 
-		userRepo.(*mocks.MockRepository).Mock.On("Update", mock.Anything, mock.Anything).Return(&user.User{
+		userRepo.(*mocks.MockRepository).Mock.On("Update", mock.Anything, mock.Anything).Return(&users.User{
 			ID:        id,
 			Name:      name,
 			Email:     email,
@@ -82,13 +82,13 @@ var _ = Describe("resolverUpdateUser", func() {
 		id := uuid.New()
 		name := "Matt"
 		newEmail := "matt@mail.com"
-		encryptedPassword, _ := user.HashPassword("password")
+		encryptedPassword, _ := users.HashPassword("password")
 
 		input := &genGraphql.UpdateUserInput{
 			Email: &newEmail,
 		}
 
-		userRepo.(*mocks.MockRepository).Mock.On("GetByID", mock.Anything, mock.Anything).Return(&user.User{
+		userRepo.(*mocks.MockRepository).Mock.On("GetByID", mock.Anything, mock.Anything).Return(&users.User{
 			ID:        id,
 			Name:      name,
 			Email:     "tombrady@nepatrios.com",
@@ -98,7 +98,7 @@ var _ = Describe("resolverUpdateUser", func() {
 			DeletedAt: nil,
 		}, nil)
 
-		userRepo.(*mocks.MockRepository).Mock.On("Update", mock.Anything, mock.Anything).Return(&user.User{
+		userRepo.(*mocks.MockRepository).Mock.On("Update", mock.Anything, mock.Anything).Return(&users.User{
 			ID:        id,
 			Name:      name,
 			Email:     newEmail,

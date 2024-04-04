@@ -8,7 +8,7 @@ import (
 	"context"
 
 	graphql1 "github.com/anti-duhring/autojud/internal/generated/graphql"
-	"github.com/anti-duhring/autojud/internal/user"
+	"github.com/anti-duhring/autojud/internal/users"
 )
 
 // Login is the resolver for the Login field.
@@ -34,7 +34,7 @@ func (r *mutationResolver) Login(ctx context.Context, email string, password str
 
 // Register is the resolver for the Register field.
 func (r *mutationResolver) Register(ctx context.Context, input graphql1.CreateUserInput) (*graphql1.AuthResponse, error) {
-	user := user.User{
+	user := users.User{
 		Name:     input.Name,
 		Email:    input.Email,
 		Password: &input.Password,

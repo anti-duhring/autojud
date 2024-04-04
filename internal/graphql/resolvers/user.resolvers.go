@@ -10,7 +10,7 @@ import (
 
 	"github.com/anti-duhring/autojud/internal/auth"
 	graphql1 "github.com/anti-duhring/autojud/internal/generated/graphql"
-	"github.com/anti-duhring/autojud/internal/user"
+	"github.com/anti-duhring/autojud/internal/users"
 	"github.com/google/uuid"
 )
 
@@ -36,7 +36,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input graphql1.Update
 		name = *input.Name
 	}
 
-	user := &user.User{
+	user := &users.User{
 		Email:    email,
 		Password: input.Password,
 		Name:     name,

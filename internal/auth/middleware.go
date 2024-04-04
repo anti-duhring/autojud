@@ -3,13 +3,13 @@ package auth
 import (
 	"net/http"
 
-	"github.com/anti-duhring/autojud/internal/user"
+	"github.com/anti-duhring/autojud/internal/users"
 	"github.com/anti-duhring/autojud/pkg/jwt"
 	"github.com/anti-duhring/goncurrency/pkg/logger"
 	"github.com/google/uuid"
 )
 
-func Middleware(userService user.Service) func(http.Handler) http.Handler {
+func Middleware(userService users.Service) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			header := r.Header.Get("Authorization")

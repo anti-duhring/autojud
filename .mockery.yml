@@ -1,7 +1,19 @@
 with-expecter: true
 packages:
-  github.com/anti-duhring/autojud/internal/user:
+  github.com/anti-duhring/autojud/internal/users:
     config:
       dir: ../../tests/mocks/
       all: true
       outpkg: mocks
+  github.com/anti-duhring/autojud/internal/processes:
+    config:
+      dir: ../../tests/mocks/
+      all: true
+      outpkg: mocks
+    interfaces:
+      Repository:
+        config:
+          mockname: "Mock{{.InterfaceName}}Processes"
+          filename: "mock_{{.InterfaceName}}Processes.go"
+
+
