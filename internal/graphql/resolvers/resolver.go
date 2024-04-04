@@ -6,10 +6,12 @@ package resolvers
 
 import (
 	"github.com/anti-duhring/autojud/internal/auth"
+	"github.com/anti-duhring/autojud/internal/processes"
 	"github.com/anti-duhring/autojud/internal/users"
 )
 
 type Resolver struct {
-	UserService *users.Service
-	AuthService *auth.Service
+	UserService    *users.Service
+	AuthService    *auth.Service
+	ProcessService *processes.Service
 }

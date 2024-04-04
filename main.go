@@ -9,6 +9,7 @@ import (
 	"github.com/anti-duhring/autojud/internal/db"
 	genGraphql "github.com/anti-duhring/autojud/internal/generated/graphql"
 	"github.com/anti-duhring/autojud/internal/graphql/resolvers"
+	"github.com/anti-duhring/autojud/internal/processes"
 	"github.com/anti-duhring/autojud/internal/users"
 	"github.com/anti-duhring/goncurrency/pkg/logger"
 	"github.com/go-chi/chi"
@@ -22,15 +23,19 @@ func main() {
 	defer db.Close()
 
 	userRepo := users.NewRepositoryPostgres(db)
+	processRepo := processes.NewRepositoryPostgres(db)
+
 	userService := users.NewService(userRepo)
+	processService := processes.NewService(processRepo)
 	authService := auth.NewService(*userService)
 
 	router := chi.NewRouter()
 	router.Use(auth.Middleware(*userService))
 
 	c := genGraphql.Config{Resolvers: &resolvers.Resolver{
-		UserService: userService,
-		AuthService: authService,
+		UserService:    userService,
+		AuthService:    authService,
+		ProcessService: processService,
 	}}
 	c.Directives.Auth = auth.AuthDirective
 

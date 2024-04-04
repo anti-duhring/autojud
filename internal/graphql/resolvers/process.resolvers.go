@@ -8,10 +8,35 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/anti-duhring/autojud/internal/auth"
 	graphql1 "github.com/anti-duhring/autojud/internal/generated/graphql"
+	"github.com/anti-duhring/autojud/internal/graphql/resolvers/formatters"
+	"github.com/google/uuid"
 )
 
 // FollowProcess is the resolver for the FollowProcess field.
 func (r *mutationResolver) FollowProcess(ctx context.Context, processNumber string) (*graphql1.Process, error) {
-	panic(fmt.Errorf("not implemented: FollowProcess - FollowProcess"))
+	userID := auth.GetUserID(ctx)
+	if userID == "" {
+		return nil, fmt.Errorf("Access Denied")
+	}
+
+	uUserID, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, fmt.Errorf("Access Denied")
+	}
+
+	process, err := r.ProcessService.GetByProcessNumber(processNumber, ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = r.ProcessService.FollowProcess(process.ID, uUserID, ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	fProcess := formatters.FormatProcess(process)
+
+	return fProcess, nil
 }
