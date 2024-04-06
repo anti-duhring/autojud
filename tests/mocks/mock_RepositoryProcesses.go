@@ -82,6 +82,65 @@ func (_c *MockRepositoryProcesses_CreateProcessFollow_Call) RunAndReturn(run fun
 	return _c
 }
 
+// GetByProcessNumber provides a mock function with given fields: ctx, processNumber
+func (_m *MockRepositoryProcesses) GetByProcessNumber(ctx context.Context, processNumber string) (*processes.Process, error) {
+	ret := _m.Called(ctx, processNumber)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetByProcessNumber")
+	}
+
+	var r0 *processes.Process
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*processes.Process, error)); ok {
+		return rf(ctx, processNumber)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) *processes.Process); ok {
+		r0 = rf(ctx, processNumber)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*processes.Process)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, processNumber)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockRepositoryProcesses_GetByProcessNumber_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByProcessNumber'
+type MockRepositoryProcesses_GetByProcessNumber_Call struct {
+	*mock.Call
+}
+
+// GetByProcessNumber is a helper method to define mock.On call
+//   - ctx context.Context
+//   - processNumber string
+func (_e *MockRepositoryProcesses_Expecter) GetByProcessNumber(ctx interface{}, processNumber interface{}) *MockRepositoryProcesses_GetByProcessNumber_Call {
+	return &MockRepositoryProcesses_GetByProcessNumber_Call{Call: _e.mock.On("GetByProcessNumber", ctx, processNumber)}
+}
+
+func (_c *MockRepositoryProcesses_GetByProcessNumber_Call) Run(run func(ctx context.Context, processNumber string)) *MockRepositoryProcesses_GetByProcessNumber_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *MockRepositoryProcesses_GetByProcessNumber_Call) Return(_a0 *processes.Process, _a1 error) *MockRepositoryProcesses_GetByProcessNumber_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockRepositoryProcesses_GetByProcessNumber_Call) RunAndReturn(run func(context.Context, string) (*processes.Process, error)) *MockRepositoryProcesses_GetByProcessNumber_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewMockRepositoryProcesses creates a new instance of MockRepositoryProcesses. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewMockRepositoryProcesses(t interface {
