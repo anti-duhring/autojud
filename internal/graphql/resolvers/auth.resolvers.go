@@ -8,6 +8,7 @@ import (
 	"context"
 
 	graphql1 "github.com/anti-duhring/autojud/internal/generated/graphql"
+	"github.com/anti-duhring/autojud/internal/graphql/resolvers/formatters"
 	"github.com/anti-duhring/autojud/internal/users"
 )
 
@@ -18,15 +19,10 @@ func (r *mutationResolver) Login(ctx context.Context, email string, password str
 		return nil, err
 	}
 
+	fUser := formatters.FormatUser(&response.User)
+
 	return &graphql1.AuthResponse{
-		User: &graphql1.User{
-			ID:        response.User.ID.String(),
-			Name:      response.User.Name,
-			Email:     response.User.Email,
-			CreatedAt: response.User.CreatedAt,
-			UpdatedAt: response.User.UpdatedAt,
-			DeletedAt: response.User.DeletedAt,
-		},
+		User:     fUser,
 		Token:    response.Token,
 		TokenExp: float64(response.TokenExp),
 	}, nil
@@ -45,15 +41,10 @@ func (r *mutationResolver) Register(ctx context.Context, input graphql1.CreateUs
 		return nil, err
 	}
 
+	fUser := formatters.FormatUser(&response.User)
+
 	return &graphql1.AuthResponse{
-		User: &graphql1.User{
-			ID:        response.User.ID.String(),
-			Name:      response.User.Name,
-			Email:     response.User.Email,
-			CreatedAt: response.User.CreatedAt,
-			UpdatedAt: response.User.UpdatedAt,
-			DeletedAt: response.User.DeletedAt,
-		},
+		User:     fUser,
 		Token:    response.Token,
 		TokenExp: float64(response.TokenExp),
 	}, nil

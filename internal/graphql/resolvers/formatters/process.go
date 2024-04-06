@@ -5,7 +5,7 @@ import (
 	"github.com/anti-duhring/autojud/internal/processes"
 )
 
-var courtMap map[processes.Court]graphql.Court = map[processes.Court]graphql.Court{
+var courtMap = map[processes.Court]graphql.Court{
 	processes.COURT_TJPE: graphql.CourtTjpe,
 }
 
