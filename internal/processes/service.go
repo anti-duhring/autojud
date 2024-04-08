@@ -34,3 +34,23 @@ func (s *Service) GetByProcessNumber(processNumber string, ctx context.Context) 
 
 	return process, nil
 }
+
+func (s *Service) GetProcessFromUser(userID uuid.UUID, limit, offset int, ctx context.Context) ([]*Process, error) {
+	processes, err := s.Repository.GetAllByUserID(ctx, userID.String(), limit, offset)
+	if err != nil {
+		logger.Error("error getting process from user", err)
+		return nil, ErrInternal
+	}
+
+	return processes, nil
+}
+
+func (s *Service) CountProcessFromUser(userID uuid.UUID, ctx context.Context) (int, error) {
+	count, err := s.Repository.CountByUserID(ctx, userID.String())
+	if err != nil {
+		logger.Error("error counting process from user", err)
+		return 0, ErrInternal
+	}
+
+	return count, nil
+}

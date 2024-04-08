@@ -38,6 +38,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Mutation() MutationResolver
+	Query() QueryResolver
 }
 
 type DirectiveRoot struct {
@@ -71,7 +72,14 @@ type ComplexityRoot struct {
 		UpdatedAt     func(childComplexity int) int
 	}
 
+	ProcessList struct {
+		Count       func(childComplexity int) int
+		HasNextPage func(childComplexity int) int
+		Nodes       func(childComplexity int) int
+	}
+
 	Query struct {
+		GetProcessList func(childComplexity int, limit int, offset int) int
 	}
 
 	User struct {
@@ -90,6 +98,9 @@ type MutationResolver interface {
 	Login(ctx context.Context, email string, password string) (*AuthResponse, error)
 	Register(ctx context.Context, input CreateUserInput) (*AuthResponse, error)
 	FollowProcess(ctx context.Context, processNumber string) (*Process, error)
+}
+type QueryResolver interface {
+	GetProcessList(ctx context.Context, limit int, offset int) (*ProcessList, error)
 }
 
 type executableSchema struct {
@@ -249,6 +260,39 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Process.UpdatedAt(childComplexity), true
+
+	case "ProcessList.count":
+		if e.complexity.ProcessList.Count == nil {
+			break
+		}
+
+		return e.complexity.ProcessList.Count(childComplexity), true
+
+	case "ProcessList.hasNextPage":
+		if e.complexity.ProcessList.HasNextPage == nil {
+			break
+		}
+
+		return e.complexity.ProcessList.HasNextPage(childComplexity), true
+
+	case "ProcessList.nodes":
+		if e.complexity.ProcessList.Nodes == nil {
+			break
+		}
+
+		return e.complexity.ProcessList.Nodes(childComplexity), true
+
+	case "Query.GetProcessList":
+		if e.complexity.Query.GetProcessList == nil {
+			break
+		}
+
+		args, err := ec.field_Query_GetProcessList_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetProcessList(childComplexity, args["limit"].(int), args["offset"].(int)), true
 
 	case "User.createdAt":
 		if e.complexity.User.CreatedAt == nil {
@@ -447,8 +491,18 @@ enum Court {
   TJPE
 }
 
+type ProcessList {
+  nodes: [Process!]!
+  count: Int!
+  hasNextPage: Boolean!
+}
+
 extend type Mutation {
- FollowProcess(processNumber: String!): Process! @auth
+  FollowProcess(processNumber: String!): Process! @auth
+}
+
+type Query {
+  GetProcessList(limit: Int!, offset: Int!): ProcessList! @auth
 }
 `, BuiltIn: false},
 	{Name: "../../graphql/user.graphql", Input: `type User {
@@ -545,6 +599,30 @@ func (ec *executionContext) field_Mutation_UpdateUser_args(ctx context.Context, 
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_GetProcessList_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg1
 	return args, nil
 }
 
@@ -1484,6 +1562,243 @@ func (ec *executionContext) fieldContext_Process_deletedAt(ctx context.Context, 
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProcessList_nodes(ctx context.Context, field graphql.CollectedField, obj *ProcessList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProcessList_nodes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nodes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*Process)
+	fc.Result = res
+	return ec.marshalNProcess2ᚕᚖgithubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐProcessᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProcessList_nodes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProcessList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Process_id(ctx, field)
+			case "processNumber":
+				return ec.fieldContext_Process_processNumber(ctx, field)
+			case "court":
+				return ec.fieldContext_Process_court(ctx, field)
+			case "origin":
+				return ec.fieldContext_Process_origin(ctx, field)
+			case "judge":
+				return ec.fieldContext_Process_judge(ctx, field)
+			case "activePart":
+				return ec.fieldContext_Process_activePart(ctx, field)
+			case "passivePart":
+				return ec.fieldContext_Process_passivePart(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Process_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Process_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Process_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Process", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProcessList_count(ctx context.Context, field graphql.CollectedField, obj *ProcessList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProcessList_count(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProcessList_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProcessList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProcessList_hasNextPage(ctx context.Context, field graphql.CollectedField, obj *ProcessList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProcessList_hasNextPage(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HasNextPage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProcessList_hasNextPage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProcessList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_GetProcessList(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_GetProcessList(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().GetProcessList(rctx, fc.Args["limit"].(int), fc.Args["offset"].(int))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*ProcessList); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/anti-duhring/autojud/internal/generated/graphql.ProcessList`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ProcessList)
+	fc.Result = res
+	return ec.marshalNProcessList2ᚖgithubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐProcessList(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_GetProcessList(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "nodes":
+				return ec.fieldContext_ProcessList_nodes(ctx, field)
+			case "count":
+				return ec.fieldContext_ProcessList_count(ctx, field)
+			case "hasNextPage":
+				return ec.fieldContext_ProcessList_hasNextPage(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProcessList", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_GetProcessList_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -3970,6 +4285,55 @@ func (ec *executionContext) _Process(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var processListImplementors = []string{"ProcessList"}
+
+func (ec *executionContext) _ProcessList(ctx context.Context, sel ast.SelectionSet, obj *ProcessList) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, processListImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProcessList")
+		case "nodes":
+			out.Values[i] = ec._ProcessList_nodes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "count":
+			out.Values[i] = ec._ProcessList_count(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "hasNextPage":
+			out.Values[i] = ec._ProcessList_hasNextPage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -3989,6 +4353,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "GetProcessList":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_GetProcessList(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -4483,8 +4869,67 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) marshalNProcess2githubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐProcess(ctx context.Context, sel ast.SelectionSet, v Process) graphql.Marshaler {
 	return ec._Process(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProcess2ᚕᚖgithubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐProcessᚄ(ctx context.Context, sel ast.SelectionSet, v []*Process) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNProcess2ᚖgithubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐProcess(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalNProcess2ᚖgithubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐProcess(ctx context.Context, sel ast.SelectionSet, v *Process) graphql.Marshaler {
@@ -4495,6 +4940,20 @@ func (ec *executionContext) marshalNProcess2ᚖgithubᚗcomᚋantiᚑduhringᚋa
 		return graphql.Null
 	}
 	return ec._Process(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProcessList2githubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐProcessList(ctx context.Context, sel ast.SelectionSet, v ProcessList) graphql.Marshaler {
+	return ec._ProcessList(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProcessList2ᚖgithubᚗcomᚋantiᚑduhringᚋautojudᚋinternalᚋgeneratedᚋgraphqlᚐProcessList(ctx context.Context, sel ast.SelectionSet, v *ProcessList) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ProcessList(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

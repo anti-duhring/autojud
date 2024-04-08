@@ -40,3 +40,39 @@ func (r *mutationResolver) FollowProcess(ctx context.Context, processNumber stri
 
 	return fProcess, nil
 }
+
+// GetProcessList is the resolver for the GetProcessList field.
+func (r *queryResolver) GetProcessList(ctx context.Context, limit int, offset int) (*graphql1.ProcessList, error) {
+	userID := auth.GetUserID(ctx)
+	if userID == "" {
+		return nil, fmt.Errorf("Access Denied")
+	}
+
+	uUserID, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, fmt.Errorf("Access Denied")
+	}
+
+	processes, err := r.ProcessService.GetProcessFromUser(uUserID, limit, offset, ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	count, err := r.ProcessService.CountProcessFromUser(uUserID, ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	fProcesses := formatters.FormatProcessList(processes)
+
+	return &graphql1.ProcessList{
+		Nodes:       fProcesses,
+		Count:       count,
+		HasNextPage: count > limit+offset,
+	}, nil
+}
+
+// Query returns graphql1.QueryResolver implementation.
+func (r *Resolver) Query() graphql1.QueryResolver { return &queryResolver{r} }
+
+type queryResolver struct{ *Resolver }

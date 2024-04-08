@@ -22,6 +22,63 @@ func (_m *MockRepositoryProcesses) EXPECT() *MockRepositoryProcesses_Expecter {
 	return &MockRepositoryProcesses_Expecter{mock: &_m.Mock}
 }
 
+// CountByUserID provides a mock function with given fields: ctx, userID
+func (_m *MockRepositoryProcesses) CountByUserID(ctx context.Context, userID string) (int, error) {
+	ret := _m.Called(ctx, userID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CountByUserID")
+	}
+
+	var r0 int
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (int, error)); ok {
+		return rf(ctx, userID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) int); ok {
+		r0 = rf(ctx, userID)
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, userID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockRepositoryProcesses_CountByUserID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CountByUserID'
+type MockRepositoryProcesses_CountByUserID_Call struct {
+	*mock.Call
+}
+
+// CountByUserID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID string
+func (_e *MockRepositoryProcesses_Expecter) CountByUserID(ctx interface{}, userID interface{}) *MockRepositoryProcesses_CountByUserID_Call {
+	return &MockRepositoryProcesses_CountByUserID_Call{Call: _e.mock.On("CountByUserID", ctx, userID)}
+}
+
+func (_c *MockRepositoryProcesses_CountByUserID_Call) Run(run func(ctx context.Context, userID string)) *MockRepositoryProcesses_CountByUserID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *MockRepositoryProcesses_CountByUserID_Call) Return(_a0 int, _a1 error) *MockRepositoryProcesses_CountByUserID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockRepositoryProcesses_CountByUserID_Call) RunAndReturn(run func(context.Context, string) (int, error)) *MockRepositoryProcesses_CountByUserID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateProcessFollow provides a mock function with given fields: ctx, processID, userID
 func (_m *MockRepositoryProcesses) CreateProcessFollow(ctx context.Context, processID string, userID string) (*processes.ProcessFollow, error) {
 	ret := _m.Called(ctx, processID, userID)
@@ -78,6 +135,67 @@ func (_c *MockRepositoryProcesses_CreateProcessFollow_Call) Return(_a0 *processe
 }
 
 func (_c *MockRepositoryProcesses_CreateProcessFollow_Call) RunAndReturn(run func(context.Context, string, string) (*processes.ProcessFollow, error)) *MockRepositoryProcesses_CreateProcessFollow_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetAllByUserID provides a mock function with given fields: ctx, userID, limit, offset
+func (_m *MockRepositoryProcesses) GetAllByUserID(ctx context.Context, userID string, limit int, offset int) ([]*processes.Process, error) {
+	ret := _m.Called(ctx, userID, limit, offset)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAllByUserID")
+	}
+
+	var r0 []*processes.Process
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, int, int) ([]*processes.Process, error)); ok {
+		return rf(ctx, userID, limit, offset)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, int, int) []*processes.Process); ok {
+		r0 = rf(ctx, userID, limit, offset)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*processes.Process)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, int, int) error); ok {
+		r1 = rf(ctx, userID, limit, offset)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockRepositoryProcesses_GetAllByUserID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAllByUserID'
+type MockRepositoryProcesses_GetAllByUserID_Call struct {
+	*mock.Call
+}
+
+// GetAllByUserID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID string
+//   - limit int
+//   - offset int
+func (_e *MockRepositoryProcesses_Expecter) GetAllByUserID(ctx interface{}, userID interface{}, limit interface{}, offset interface{}) *MockRepositoryProcesses_GetAllByUserID_Call {
+	return &MockRepositoryProcesses_GetAllByUserID_Call{Call: _e.mock.On("GetAllByUserID", ctx, userID, limit, offset)}
+}
+
+func (_c *MockRepositoryProcesses_GetAllByUserID_Call) Run(run func(ctx context.Context, userID string, limit int, offset int)) *MockRepositoryProcesses_GetAllByUserID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(int), args[3].(int))
+	})
+	return _c
+}
+
+func (_c *MockRepositoryProcesses_GetAllByUserID_Call) Return(_a0 []*processes.Process, _a1 error) *MockRepositoryProcesses_GetAllByUserID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockRepositoryProcesses_GetAllByUserID_Call) RunAndReturn(run func(context.Context, string, int, int) ([]*processes.Process, error)) *MockRepositoryProcesses_GetAllByUserID_Call {
 	_c.Call.Return(run)
 	return _c
 }

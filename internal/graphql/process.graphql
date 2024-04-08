@@ -16,6 +16,16 @@ enum Court {
   TJPE
 }
 
+type ProcessList {
+  nodes: [Process!]!
+  count: Int!
+  hasNextPage: Boolean!
+}
+
 extend type Mutation {
- FollowProcess(processNumber: String!): Process! @auth
+  FollowProcess(processNumber: String!): Process! @auth
+}
+
+type Query {
+  GetProcessList(limit: Int!, offset: Int!): ProcessList! @auth
 }

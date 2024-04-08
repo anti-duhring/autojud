@@ -29,3 +29,16 @@ func FormatProcess(process *processes.Process) *graphql.Process {
 		DeletedAt:     process.DeletedAt,
 	}
 }
+
+func FormatProcessList(processes []*processes.Process) []*graphql.Process {
+	if processes == nil {
+		return nil
+	}
+
+	var fProcesses []*graphql.Process
+	for _, process := range processes {
+		fProcesses = append(fProcesses, FormatProcess(process))
+	}
+
+	return fProcesses
+}

@@ -36,6 +36,12 @@ type Process struct {
 	DeletedAt     *string `json:"deletedAt,omitempty"`
 }
 
+type ProcessList struct {
+	Nodes       []*Process `json:"nodes"`
+	Count       int        `json:"count"`
+	HasNextPage bool       `json:"hasNextPage"`
+}
+
 type Query struct {
 }
 
