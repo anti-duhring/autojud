@@ -44,6 +44,8 @@ github.com/agnivade/levenshtein v1.1.1 h1:QY8M92nrzkmr798gCo3kmMyqXFzdQVpxLlGPRB
 github.com/agnivade/levenshtein v1.1.1/go.mod h1:veldBMzWxcCG2ZvUTKD2kJNRdCk5hVbJomOvKkmgYbo=
 github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883 h1:bvNMNQO63//z+xNgfBlViaCIJKLlCJ6/fmUseuG0wVQ=
 github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883/go.mod h1:rCTlJbsFo29Kk6CurOXKm700vrz8f0KW0JNfpkRJY/8=
+github.com/anti-duhring/crawjud v0.0.2 h1:JPNKUqVYl9YXaTwHq6C5zSTmwH2HDwap7cqRzGdrA9Y=
+github.com/anti-duhring/crawjud v0.0.2/go.mod h1:1bNi8C3FW7fmAyanNXfdjTaox+Xeqqhc/oZklmlLGRs=
 github.com/anti-duhring/goncurrency v0.0.0-20240306020008-09c20c96f4da h1:E4igsxCCiKcsLLO6NiMGsBrs0UbXpR46OZJ3VzfTD7A=
 github.com/anti-duhring/goncurrency v0.0.0-20240306020008-09c20c96f4da/go.mod h1:Xrb/EOXCWB6/YRoPKHPt08JHOngi7afRTugiH0meVMI=
 github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0 h1:jfIu9sQUG6Ig+0+Ap1h4unLjW6YQJpKZVmUzxsD4E/Q=

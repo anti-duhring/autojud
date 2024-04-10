@@ -3,6 +3,7 @@ package processes
 import (
 	"context"
 
+	crawjud "github.com/anti-duhring/crawjud/pkg/utils"
 	"github.com/anti-duhring/goncurrency/pkg/logger"
 	"github.com/google/uuid"
 )
@@ -53,4 +54,36 @@ func (s *Service) CountProcessFromUser(userID uuid.UUID, ctx context.Context) (i
 	}
 
 	return count, nil
+}
+
+func (s *Service) CreatePendingProcess(processNumber string, ctx context.Context) (*PendingProcess, error) {
+	var court Court
+
+	courtCode, err := crawjud.GetCourtByProcessNumber(processNumber)
+	if err != nil || courtCode == nil {
+		logger.Error("error getting court by process number", err)
+		court = COURT_UNKNOWN
+	}
+
+	if courtCode != nil {
+		court = getCourtFromString(*courtCode)
+	}
+	process := &Process{
+		ProcessNumber: processNumber,
+		Court:         court,
+	}
+
+	createdProcess, err := s.Repository.CreateProcess(ctx, process)
+	if err != nil {
+		logger.Error("error creating process", err)
+		return nil, ErrInternal
+	}
+
+	pendingProcess, err := s.Repository.CreatePendingProcess(ctx, createdProcess.ID.String())
+	if err != nil {
+		logger.Error("error creating pending process", err)
+		return nil, ErrInternal
+	}
+
+	return pendingProcess, nil
 }

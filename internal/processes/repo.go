@@ -7,6 +7,8 @@ import (
 
 type Repository interface {
 	CreateProcessFollow(ctx context.Context, processID string, userID string) (*ProcessFollow, error)
+	CreatePendingProcess(ctx context.Context, processID string) (*PendingProcess, error)
+	CreateProcess(ctx context.Context, process *Process) (*Process, error)
 	GetByProcessNumber(ctx context.Context, processNumber string) (*Process, error)
 	GetAllByUserID(ctx context.Context, userID string, limit, offset int) ([]*Process, error)
 	CountByUserID(ctx context.Context, userID string) (int, error)
@@ -82,4 +84,28 @@ func (r *RepositoryPostgres) CountByUserID(ctx context.Context, userID string) (
 	}
 
 	return count, nil
+}
+
+func (r *RepositoryPostgres) CreatePendingProcess(ctx context.Context, processID string) (*PendingProcess, error) {
+	var createdPendingProcess PendingProcess
+
+	query := `INSERT INTO pending_processes (process_id) VALUES ($1) RETURNING id, process_id, created_at, inserted_at, deleted_at;`
+	err := r.DB.QueryRowContext(ctx, query, processID).Scan(&createdPendingProcess.ID, &createdPendingProcess.ProcessID, &createdPendingProcess.CreatedAt, &createdPendingProcess.InsertedAt, &createdPendingProcess.DeletedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &createdPendingProcess, nil
+}
+
+func (r *RepositoryPostgres) CreateProcess(ctx context.Context, process *Process) (*Process, error) {
+	var createdProcess Process
+
+	query := `INSERT INTO processes (process_number, court, origin, judge, active_part, passive_part) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, process_number, court, origin, judge, active_part, passive_part, created_at, updated_at, deleted_at;`
+	err := r.DB.QueryRowContext(ctx, query, process.ProcessNumber, process.Court, process.Origin, process.Judge, process.ActivePart, process.PassivePart).Scan(&createdProcess.ID, &createdProcess.ProcessNumber, &createdProcess.Court, &createdProcess.Origin, &createdProcess.Judge, &createdProcess.ActivePart, &createdProcess.PassivePart, &createdProcess.CreatedAt, &createdProcess.UpdatedAt, &createdProcess.DeletedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &createdProcess, nil
 }

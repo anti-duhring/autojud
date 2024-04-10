@@ -5,7 +5,8 @@ import "github.com/google/uuid"
 type Court string
 
 const (
-	COURT_TJPE Court = "TJPE"
+	COURT_UNKNOWN Court = "UNKNOWN"
+	COURT_TJPE    Court = "TJPE"
 )
 
 type ProcessFollow struct {
@@ -14,6 +15,14 @@ type ProcessFollow struct {
 	ProcessID uuid.UUID `json:"process_id"`
 	CreatedAt string    `json:"created_at"`
 	DeletedAt *string   `json:"deleted_at"`
+}
+
+type PendingProcess struct {
+	ID         uuid.UUID `json:"id"`
+	ProcessID  uuid.UUID `json:"process_id"`
+	CreatedAt  string    `json:"created_at"`
+	InsertedAt *string   `json:"inserted_at"`
+	DeletedAt  *string   `json:"deleted_at"`
 }
 
 type Process struct {
