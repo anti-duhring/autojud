@@ -6,11 +6,14 @@ package resolvers
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/anti-duhring/autojud/internal/auth"
 	graphql1 "github.com/anti-duhring/autojud/internal/generated/graphql"
 	"github.com/anti-duhring/autojud/internal/graphql/resolvers/formatters"
+	"github.com/anti-duhring/autojud/internal/processes"
 	"github.com/google/uuid"
 )
 
@@ -26,9 +29,18 @@ func (r *mutationResolver) FollowProcess(ctx context.Context, processNumber stri
 		return nil, fmt.Errorf("Access Denied")
 	}
 
-	process, err := r.ProcessService.GetByProcessNumber(processNumber, ctx)
-	if err != nil {
-		return nil, err
+	// If the user tries to follow a process that does not exist yet, we insert on both PendingProcess and Process tables
+	var process *processes.Process
+	process, err = r.ProcessService.GetByProcessNumber(processNumber, ctx)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, fmt.Errorf("Error while fetching process")
+	}
+
+	if errors.Is(err, sql.ErrNoRows) {
+		_, process, err = r.ProcessService.CreatePendingProcess(processNumber, ctx)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	_, err = r.ProcessService.FollowProcess(process.ID, uUserID, ctx)

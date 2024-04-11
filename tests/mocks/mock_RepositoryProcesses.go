@@ -79,6 +79,124 @@ func (_c *MockRepositoryProcesses_CountByUserID_Call) RunAndReturn(run func(cont
 	return _c
 }
 
+// CreatePendingProcess provides a mock function with given fields: ctx, processID
+func (_m *MockRepositoryProcesses) CreatePendingProcess(ctx context.Context, processID string) (*processes.PendingProcess, error) {
+	ret := _m.Called(ctx, processID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreatePendingProcess")
+	}
+
+	var r0 *processes.PendingProcess
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*processes.PendingProcess, error)); ok {
+		return rf(ctx, processID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) *processes.PendingProcess); ok {
+		r0 = rf(ctx, processID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*processes.PendingProcess)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, processID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockRepositoryProcesses_CreatePendingProcess_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreatePendingProcess'
+type MockRepositoryProcesses_CreatePendingProcess_Call struct {
+	*mock.Call
+}
+
+// CreatePendingProcess is a helper method to define mock.On call
+//   - ctx context.Context
+//   - processID string
+func (_e *MockRepositoryProcesses_Expecter) CreatePendingProcess(ctx interface{}, processID interface{}) *MockRepositoryProcesses_CreatePendingProcess_Call {
+	return &MockRepositoryProcesses_CreatePendingProcess_Call{Call: _e.mock.On("CreatePendingProcess", ctx, processID)}
+}
+
+func (_c *MockRepositoryProcesses_CreatePendingProcess_Call) Run(run func(ctx context.Context, processID string)) *MockRepositoryProcesses_CreatePendingProcess_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *MockRepositoryProcesses_CreatePendingProcess_Call) Return(_a0 *processes.PendingProcess, _a1 error) *MockRepositoryProcesses_CreatePendingProcess_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockRepositoryProcesses_CreatePendingProcess_Call) RunAndReturn(run func(context.Context, string) (*processes.PendingProcess, error)) *MockRepositoryProcesses_CreatePendingProcess_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CreateProcess provides a mock function with given fields: ctx, process
+func (_m *MockRepositoryProcesses) CreateProcess(ctx context.Context, process *processes.Process) (*processes.Process, error) {
+	ret := _m.Called(ctx, process)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateProcess")
+	}
+
+	var r0 *processes.Process
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *processes.Process) (*processes.Process, error)); ok {
+		return rf(ctx, process)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *processes.Process) *processes.Process); ok {
+		r0 = rf(ctx, process)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*processes.Process)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *processes.Process) error); ok {
+		r1 = rf(ctx, process)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockRepositoryProcesses_CreateProcess_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateProcess'
+type MockRepositoryProcesses_CreateProcess_Call struct {
+	*mock.Call
+}
+
+// CreateProcess is a helper method to define mock.On call
+//   - ctx context.Context
+//   - process *processes.Process
+func (_e *MockRepositoryProcesses_Expecter) CreateProcess(ctx interface{}, process interface{}) *MockRepositoryProcesses_CreateProcess_Call {
+	return &MockRepositoryProcesses_CreateProcess_Call{Call: _e.mock.On("CreateProcess", ctx, process)}
+}
+
+func (_c *MockRepositoryProcesses_CreateProcess_Call) Run(run func(ctx context.Context, process *processes.Process)) *MockRepositoryProcesses_CreateProcess_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*processes.Process))
+	})
+	return _c
+}
+
+func (_c *MockRepositoryProcesses_CreateProcess_Call) Return(_a0 *processes.Process, _a1 error) *MockRepositoryProcesses_CreateProcess_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockRepositoryProcesses_CreateProcess_Call) RunAndReturn(run func(context.Context, *processes.Process) (*processes.Process, error)) *MockRepositoryProcesses_CreateProcess_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateProcessFollow provides a mock function with given fields: ctx, processID, userID
 func (_m *MockRepositoryProcesses) CreateProcessFollow(ctx context.Context, processID string, userID string) (*processes.ProcessFollow, error) {
 	ret := _m.Called(ctx, processID, userID)

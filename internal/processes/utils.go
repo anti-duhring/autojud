@@ -1,6 +1,6 @@
 package processes
 
-func getCourtFromString(court string) Court {
+func parseCourt(court string) Court {
 	switch court {
 	case "TJPE":
 		return COURT_TJPE

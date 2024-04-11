@@ -64,16 +64,18 @@ type User struct {
 type Court string
 
 const (
-	CourtTjpe Court = "TJPE"
+	CourtUnknown Court = "UNKNOWN"
+	CourtTjpe    Court = "TJPE"
 )
 
 var AllCourt = []Court{
+	CourtUnknown,
 	CourtTjpe,
 }
 
 func (e Court) IsValid() bool {
 	switch e {
-	case CourtTjpe:
+	case CourtUnknown, CourtTjpe:
 		return true
 	}
 	return false

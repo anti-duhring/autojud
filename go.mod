@@ -4,6 +4,7 @@ go 1.22.1
 
 require (
 	github.com/99designs/gqlgen v0.17.45
+	github.com/anti-duhring/crawjud v0.0.2
 	github.com/anti-duhring/goncurrency v0.0.0-20240306020008-09c20c96f4da
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v1.5.5
@@ -19,7 +20,6 @@ require (
 
 require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
-	github.com/anti-duhring/crawjud v0.0.2 // indirect
 	github.com/chigopher/pathlib v0.19.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

@@ -30,7 +30,7 @@ func (s *Service) GetByProcessNumber(processNumber string, ctx context.Context) 
 	process, err := s.Repository.GetByProcessNumber(ctx, processNumber)
 	if err != nil {
 		logger.Error("error getting process by process number", err)
-		return nil, ErrInternal
+		return nil, err
 	}
 
 	return process, nil
@@ -56,7 +56,7 @@ func (s *Service) CountProcessFromUser(userID uuid.UUID, ctx context.Context) (i
 	return count, nil
 }
 
-func (s *Service) CreatePendingProcess(processNumber string, ctx context.Context) (*PendingProcess, error) {
+func (s *Service) CreatePendingProcess(processNumber string, ctx context.Context) (*PendingProcess, *Process, error) {
 	var court Court
 
 	courtCode, err := crawjud.GetCourtByProcessNumber(processNumber)
@@ -66,7 +66,7 @@ func (s *Service) CreatePendingProcess(processNumber string, ctx context.Context
 	}
 
 	if courtCode != nil {
-		court = getCourtFromString(*courtCode)
+		court = parseCourt(*courtCode)
 	}
 	process := &Process{
 		ProcessNumber: processNumber,
@@ -76,14 +76,14 @@ func (s *Service) CreatePendingProcess(processNumber string, ctx context.Context
 	createdProcess, err := s.Repository.CreateProcess(ctx, process)
 	if err != nil {
 		logger.Error("error creating process", err)
-		return nil, ErrInternal
+		return nil, nil, ErrInternal
 	}
 
 	pendingProcess, err := s.Repository.CreatePendingProcess(ctx, createdProcess.ID.String())
 	if err != nil {
 		logger.Error("error creating pending process", err)
-		return nil, ErrInternal
+		return nil, nil, ErrInternal
 	}
 
-	return pendingProcess, nil
+	return pendingProcess, createdProcess, nil
 }
