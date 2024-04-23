@@ -25,6 +25,15 @@ type PendingProcess struct {
 	DeletedAt  *string   `json:"deleted_at"`
 }
 
+type ProcessDevelopment struct {
+	ID              uuid.UUID `json:"id"`
+	ProcessID       uuid.UUID `json:"process_id"`
+	DevelopmentDate string    `json:"development_date"`
+	Description     string    `json:"description"`
+	CreatedAt       string    `json:"created_at"`
+	DeletedAt       *string   `json:"deleted_at"`
+}
+
 type Process struct {
 	ID            uuid.UUID `json:"id"`
 	ProcessNumber string    `json:"process_number"`

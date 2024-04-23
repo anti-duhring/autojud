@@ -2,6 +2,8 @@ package processes
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	crawjud "github.com/anti-duhring/crawjud/pkg/utils"
 	"github.com/anti-duhring/goncurrency/pkg/logger"
@@ -86,4 +88,29 @@ func (s *Service) CreatePendingProcess(processNumber string, ctx context.Context
 	}
 
 	return pendingProcess, createdProcess, nil
+}
+
+func (s *Service) CreateDevelopment(processNumber string, developmentDate, description string, ctx context.Context) (*ProcessDevelopment, *Process, error) {
+	var process *Process
+	var err error
+
+	process, err = s.Repository.GetByProcessNumber(ctx, processNumber)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, nil, err
+	}
+
+	if errors.Is(err, sql.ErrNoRows) {
+		_, process, err = s.CreatePendingProcess(processNumber, ctx)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	processDevelopment, err := s.Repository.CreateProcessDevelopment(ctx, process.ID.String(), developmentDate, description)
+	if err != nil {
+		logger.Error("error creating process development", err)
+		return nil, nil, ErrInternal
+	}
+
+	return processDevelopment, process, nil
 }

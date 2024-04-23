@@ -3,13 +3,17 @@ package processes
 import (
 	"context"
 	"database/sql"
+
+	"github.com/google/uuid"
 )
 
 type Repository interface {
 	CreateProcessFollow(ctx context.Context, processID string, userID string) (*ProcessFollow, error)
 	CreatePendingProcess(ctx context.Context, processID string) (*PendingProcess, error)
 	CreateProcess(ctx context.Context, process *Process) (*Process, error)
+	CreateProcessDevelopment(ctx context.Context, processID, date, description string) (*ProcessDevelopment, error)
 	GetByProcessNumber(ctx context.Context, processNumber string) (*Process, error)
+	GetByProcessID(ctx context.Context, processID uuid.UUID) (*Process, error)
 	GetAllByUserID(ctx context.Context, userID string, limit, offset int) ([]*Process, error)
 	CountByUserID(ctx context.Context, userID string) (int, error)
 }
@@ -108,4 +112,28 @@ func (r *RepositoryPostgres) CreateProcess(ctx context.Context, process *Process
 	}
 
 	return &createdProcess, nil
+}
+
+func (r *RepositoryPostgres) CreateProcessDevelopment(ctx context.Context, processID, date, description string) (*ProcessDevelopment, error) {
+	var createdProcessDevelopment ProcessDevelopment
+
+	query := `INSERT INTO process_developments (process_id, development_date, description) VALUES ($1, $2, $3) RETURNING id, process_id, development_date, description, created_at, deleted_at;`
+	err := r.DB.QueryRowContext(ctx, query, processID, date, description).Scan(&createdProcessDevelopment.ID, &createdProcessDevelopment.ProcessID, &createdProcessDevelopment.DevelopmentDate, &createdProcessDevelopment.Description, &createdProcessDevelopment.CreatedAt, &createdProcessDevelopment.DeletedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &createdProcessDevelopment, nil
+}
+
+func (r *RepositoryPostgres) GetByProcessID(ctx context.Context, processID uuid.UUID) (*Process, error) {
+	var process Process
+
+	query := `SELECT id, process_number, court, origin, judge, active_part, passive_part, created_at, updated_at, deleted_at FROM processes WHERE id = $1;`
+	err := r.DB.QueryRowContext(ctx, query, processID).Scan(&process.ID, &process.ProcessNumber, &process.Court, &process.Origin, &process.Judge, &process.ActivePart, &process.PassivePart, &process.CreatedAt, &process.UpdatedAt, &process.DeletedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &process, nil
 }

@@ -19,7 +19,10 @@ require (
 )
 
 require (
+	github.com/PuerkitoBio/goquery v1.9.1 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
+	github.com/andybalholm/cascadia v1.3.2 // indirect
+	github.com/anti-duhring/pdf v0.0.0-20201018143801-3b0849d8dc24 // indirect
 	github.com/chigopher/pathlib v0.19.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

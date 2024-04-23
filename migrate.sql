@@ -20,7 +20,7 @@ CREATE TABLE processes (
     passive_part VARCHAR(255),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMPTZ
+    deleted_at TIMESTAMPTZ DEFAULT NULL
 );
 
 CREATE TABLE process_follows (
@@ -28,8 +28,17 @@ CREATE TABLE process_follows (
     user_id UUID NOT NULL,
     process_id UUID NOT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (process_id) REFERENCES processes(id)
+);
+
+CREATE TABLE pending_processes (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    process_id UUID NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    inserted_at TIMESTAMPTZ DEFAULT NULL,
+    deleted_at TIMESTAMPTZ DEFAULT NULL,
     FOREIGN KEY (process_id) REFERENCES processes(id)
 );
 
