@@ -6,6 +6,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/anti-duhring/autojud/internal/auth"
+	"github.com/anti-duhring/autojud/internal/cron"
 	"github.com/anti-duhring/autojud/internal/db"
 	genGraphql "github.com/anti-duhring/autojud/internal/generated/graphql"
 	"github.com/anti-duhring/autojud/internal/graphql/resolvers"
@@ -24,10 +25,14 @@ func main() {
 
 	userRepo := users.NewRepositoryPostgres(db)
 	processRepo := processes.NewRepositoryPostgres(db)
+	cronRepo := cron.NewRepositoryPostgres(db)
 
 	userService := users.NewService(userRepo)
 	processService := processes.NewService(processRepo)
 	authService := auth.NewService(*userService)
+	cronService := cron.NewService(cronRepo, *processService)
+
+	cron.Init(cronService)
 
 	router := chi.NewRouter()
 	router.Use(auth.Middleware(*userService))

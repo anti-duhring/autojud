@@ -13,14 +13,10 @@ type CRAWLER_ID string
 type CRAWLER_FUNCTION func(*Service, *sql.Tx) error
 
 var crawlers = map[CRAWLER_ID]CRAWLER_FUNCTION{
-	"TJPE_MOVIMENTACAO": TJPEMoves,
+	"TJPE_MOVIMENTACAO": tjpeMoves,
 }
 
-func Crawl(crawlerID CRAWLER_ID, s *Service) error {
-	return s.ExecuteCron(crawlerID, TJPEMoves, context.Background())
-}
-
-func TJPEMoves(s *Service, tx *sql.Tx) error {
+func tjpeMoves(s *Service, tx *sql.Tx) error {
 	processes, err := crawjud.TJPE()
 	if err != nil {
 		return err
